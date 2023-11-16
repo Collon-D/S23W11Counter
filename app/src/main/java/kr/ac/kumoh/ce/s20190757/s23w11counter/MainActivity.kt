@@ -16,31 +16,42 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.ViewModelProvider
+import kr.ac.kumoh.ce.s20190757.s23w11counter.ui.theme.CounterViewModel
 import kr.ac.kumoh.ce.s20190757.s23w11counter.ui.theme.S23W11CounterTheme
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
+        val vm = ViewModelProvider(this)[CounterViewModel::class.java]
+
         super.onCreate(savedInstanceState)
         setContent {
             MyApp { // Lambda Function
-                // Clicker()
-                Counter()
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(8.dp),
+                    verticalArrangement = Arrangement.Center,) {
+                    Counter(vm)
+                    Counter(vm)
+                }
             }
         }
     }
 }
 
 @Composable
-fun Counter() {
-    var (count, setCount) = remember {
-        mutableStateOf(0)
-    }
+fun Counter(viewModel: CounterViewModel) {
+    //var (count, setCount) = remember { mutableStateOf(0) }
+    val count by viewModel.count.observeAsState(initial = 0)
 
     Column (modifier = Modifier
         .fillMaxWidth()
@@ -52,7 +63,7 @@ fun Counter() {
             Button(modifier = Modifier
                 .weight(1f),
                 onClick = {
-                    setCount(count + 1)
+                    viewModel.onAdd()
                 }) {
                 Text("Increase")
             }
@@ -60,7 +71,7 @@ fun Counter() {
             Button(modifier = Modifier
                 .weight(1f),
                 onClick = {
-                    setCount(count - 1)
+                    viewModel.onSub()
                 }) {
                 Text("Decrease")
             }
